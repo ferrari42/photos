@@ -1,0 +1,61 @@
+# Hash Table size
+SIZE = 10
+
+# Linear Probing Implementation
+class LinearProbingHashTable:
+    def init(self):
+        self.table = [None] * SIZE
+
+    def insert(self, name, number):
+        index = hash(name) % SIZE
+        while self.table[index] is not None:
+            index = (index + 1) % SIZE
+        self.table[index] = (name, number)
+
+    def search(self, name):
+        index = hash(name) % SIZE
+        comparisons = 0
+        while self.table[index] is not None:
+            comparisons += 1
+            if self.table[index][0] == name:
+                return comparisons
+            index = (index + 1) % SIZE
+        return comparisons
+
+# Chaining Implementation
+class ChainingHashTable:
+    def init(self):
+        self.table = [[] for _ in range(SIZE)]
+
+    def insert(self, name, number):
+        index = hash(name) % SIZE
+        self.table[index].append((name, number))
+
+    def search(self, name):
+        index = hash(name) % SIZE
+        comparisons = 0
+        for entry in self.table[index]:
+            comparisons += 1
+            if entry[0] == name:
+                return comparisons
+        return comparisons
+
+# Sample data
+clients = [("Alice", "1111"), ("Bob", "2222"), ("Charlie", "3333"),
+           ("David", "4444"), ("Eve", "5555"), ("Frank", "6666")]
+
+# Initialize tables
+linear_table = LinearProbingHashTable()
+chaining_table = ChainingHashTable()
+
+# Insert clients
+for name, number in clients:
+    linear_table.insert(name, number)
+    chaining_table.insert(name, number)
+
+# Compare search
+print("Comparisons (Name | Linear | Chaining):")
+for name, _ in clients:
+    l_comp = linear_table.search(name)
+    c_comp = chaining_table.search(name)
+    print(f"{name:<7} | {l_comp:^6} | {c_comp:^8}")
