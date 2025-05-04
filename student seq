@@ -1,0 +1,147 @@
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+
+class Student {
+public:
+    int rollno;
+    char name[50];
+    char address[50];
+    char division[5];
+
+    
+    void input() {
+        cout << "\nEnter Roll No: ";
+        cin >> rollno;
+        cin.ignore(); 
+        cout << "Enter Name: ";
+        cin.getline(name, 50);
+        cout << "Enter Address: ";
+        cin.getline(address, 50);
+        cout << "Enter Division: ";
+        cin.getline(division, 5);
+    }
+
+   
+    void display() {
+        cout << "\nRoll No: " << rollno;
+        cout << "\nName: " << name;
+        cout << "\nAddress: " << address;
+        cout << "\nDivision: " << division << "\n";
+    }
+
+    
+    int getRollNo() {
+        return rollno;
+    }
+};
+
+
+void addRecord() {
+    ofstream file("Student.dat", ios::binary | ios::app); 
+    Student s;
+    s.input(); 
+    file.write((char*)&s, sizeof(s)); 
+    file.close();
+    cout << "\nRecord added successfully!\n";
+}
+
+
+void showAll() {
+    ifstream file("Student.dat", ios::binary);
+    Student s;
+    while (file.read((char*)&s, sizeof(s))) {
+        s.display();
+    }
+    file.close();
+}
+
+
+void searchRecord(int r) {
+    ifstream file("Student.dat", ios::binary);
+    Student s;
+    bool found = false;
+
+    while (file.read((char*)&s, sizeof(s))) {
+        if (s.getRollNo() == r) {
+            cout << "\nRecord Found:";
+            s.display();
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
+        cout << "\nRecord not found!\n";
+
+    file.close();
+}
+
+
+void deleteRecord(int r) {
+    ifstream inFile("Student.dat", ios::binary);
+    ofstream outFile("Temp.dat", ios::binary);
+    Student s;
+    bool deleted = false;
+
+    while (inFile.read((char*)&s, sizeof(s))) {
+        if (s.getRollNo() != r) {
+            outFile.write((char*)&s, sizeof(s));
+        } else {
+            deleted = true;
+        }
+    }
+
+    inFile.close();
+    outFile.close();
+    remove("Student.dat");
+    rename("Temp.dat", "Student.dat");
+
+    if (deleted)
+        cout << "\nRecord deleted successfully!\n";
+    else
+        cout << "\nRecord not found!\n";
+}
+
+
+int main() {
+    int choice, roll;
+
+    do {
+        cout << "\n==== Student Record Menu ====";
+        cout << "\n1. Add Record";
+        cout << "\n2. Display All Records";
+        cout << "\n3. Search Record";
+        cout << "\n4. Delete Record";
+        cout << "\n5. Exit";
+        cout << "\nEnter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                addRecord();
+                break;
+            case 2:
+                showAll();
+                break;
+            case 3:
+                cout << "\nEnter Roll No to search: ";
+                cin >> roll;
+                searchRecord(roll);
+                break;
+            case 4:
+                cout << "\nEnter Roll No to delete: ";
+                cin >> roll;
+                deleteRecord(roll);
+                break;
+            case 5:
+                cout << "\nExiting program.\n";
+                break;
+            default:
+                cout << "\nInvalid choice. Try again!\n";
+        }
+    } while (choice != 5);
+
+return 0;
+}
