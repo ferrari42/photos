@@ -1,0 +1,104 @@
+class my_set:
+    def init(self):  # corrected __init
+        self.data = set()
+
+    def add(self, element):
+        self.data.add(element)
+
+    def remove(self, element):
+        self.data.discard(element)  # corrected to use self.data
+
+    def contains(self, element):  # fixed typo
+        return element in self.data
+
+    def size(self):
+        return len(self.data)
+
+    def iterator(self):
+        return iter(self.data)
+
+    def intersection(self, other):
+        return self.data & other.data
+
+    def union(self, other):
+        return self.data | other.data
+
+    def diff(self, other):
+        return self.data - other.data
+
+    def subset(self, other):
+        return self.data <= other.data
+
+
+def menu():
+    print("\n--- Set Operations Menu ---")
+    print("1. Add element")
+    print("2. Remove element")
+    print("3. Check if element exists")
+    print("4. Display set size")
+    print("5. Display all elements")
+    print("6. Intersection with another set")
+    print("7. Union with another set")
+    print("8. Difference with another set")
+    print("9. Check if subset")
+    print("0. Exit")
+
+
+set1 = my_set()
+
+while True:
+    menu()
+    choice = input("Enter your choice: ")
+
+    if choice == '1':
+        val = input("Enter element to add: ")
+        set1.add(val)
+
+    elif choice == '2':
+        val = input("Enter element to remove: ")
+        set1.remove(val)
+
+    elif choice == '3':
+        val = input("Enter element to check: ")
+        print("Exists" if set1.contains(val) else "Not found")
+
+    elif choice == '4':
+        print("Size is:", set1.size())
+
+    elif choice == '5':
+        print("Elements are:", list(set1.iterator()))
+
+    elif choice == '6':
+        temp = my_set()
+        elems = input("Enter elements for second set (space-separated): ").split()
+        for e in elems:
+            temp.add(e)
+        print("Intersection is:", set1.intersection(temp))
+
+    elif choice == '7':
+        temp = my_set()
+        elems = input("Enter elements for second set (space-separated): ").split()
+        for e in elems:
+            temp.add(e)
+        print("Union is:", set1.union(temp))
+
+    elif choice == '8':
+        temp = my_set()
+        elems = input("Enter elements for second set (space-separated): ").split()
+        for e in elems:
+            temp.add(e)
+        print("Difference is:", set1.diff(temp))
+
+    elif choice == '9':
+        temp = my_set()
+        elems = input("Enter elements for second set (space-separated): ").split()
+        for e in elems:
+            temp.add(e)
+        print("Is Subset:", set1.subset(temp))
+
+    elif choice == '0':
+        print("Exiting.")
+        break
+
+    else:
+        print("Invalid choice. Try again.")
