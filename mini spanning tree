@@ -1,0 +1,102 @@
+#include <iostream>
+using namespace std;
+
+class Graph {
+    int cost[20][20];  
+    int visited[20];    
+    int offices, lines; 
+
+public:
+    void input();      
+    void display();     
+    void prim();       
+};
+
+
+void Graph::input() {
+    cout << "Enter number of offices: ";
+    cin >> offices;
+
+    
+    for (int i = 0; i < offices; i++) {
+        visited[i] = 0;
+        for (int j = 0; j < offices; j++) {
+            cost[i][j] = 999; 
+        }
+    }
+
+    cout << "Enter number of connections: ";
+    cin >> lines;
+
+    for (int i = 0; i < lines; i++) {
+        int from, to, wt;
+        cout << "Enter connection " << i + 1 << " (office1 office2 cost): ";
+        cin >> from >> to >> wt;
+        cost[from - 1][to - 1] = wt;
+        cost[to - 1][from - 1] = wt;
+    }
+}
+
+
+void Graph::display() {
+    cout << "\nAdjacency Matrix:\n";
+    for (int i = 0; i < offices; i++) {
+        for (int j = 0; j < offices; j++) {
+            cout << cost[i][j] << "\t";
+        }
+        cout << endl;
+    }
+}
+
+
+void Graph::prim() {
+    int total = 0;
+    visited[0] = 1;  
+
+    cout << "\nMinimum cost connections:\n";
+
+    for (int edges = 0; edges < offices - 1; edges++) {
+        int min = 999, u = -1, v = -1;
+
+        for (int i = 0; i < offices; i++) {
+            if (visited[i]) {
+                for (int j = 0; j < offices; j++) {
+                    if (!visited[j] && cost[i][j] < min) {
+                        min = cost[i][j];
+                        u = i;
+                        v = j;
+                    }
+                }
+            }
+        }
+
+        visited[v] = 1;  
+        total += min;
+        cout << "Office " << u + 1 << " -> Office " << v + 1 << " : Cost = " << min << endl;
+    }
+
+    cout << "Total Minimum Cost: " << total << endl;
+}
+
+
+int main() {
+    Graph g;
+    int choice;
+
+    do {
+        cout << "\n======= PRIM'S ALGORITHM MENU =======\n";
+        cout << "1. Input\n2. Display\n3. Find Minimum Cost\n4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: g.input(); break;
+            case 2: g.display(); break;
+            case 3: g.prim(); break;
+            case 4: cout << "Exiting...\n"; break;
+            default: cout << "Invalid choice! Try again.\n";
+        }
+    } while (choice != 4);
+
+return 0;
+}
