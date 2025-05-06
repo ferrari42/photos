@@ -1,102 +1,123 @@
 #include <iostream>
-#include <vector>
-#include <stack>
-#include <queue>
 using namespace std;
 
-class Graph {
-    int vertices;               
-    vector<int> adj[10];        
+class Queue {
+private:
+    struct Node {
+        int data;
+        Node* next;
+    };
+    Node* front;
+    Node* rear;
 
 public:
-    void createGraph();       
-    void dfs(int start);       
-    void bfs(int start);      
+    Queue() {
+        front = rear = nullptr;
+    }
+
+    void enqueue(int x) {
+        Node* t = new Node;
+        if (t == nullptr) {
+            cout << "Queue is Full" << endl;
+        } else {
+            t->data = x;
+            t->next = nullptr;
+            if (front == nullptr)
+                front = rear = t;
+            else {
+                rear->next = t;
+                rear = t;
+            }
+        }
+    }
+
+    int dequeue() {
+        int x = -1;
+        if (front == nullptr) {
+            cout << "Queue is Empty" << endl;
+        } else {
+            Node* t = front;
+            x = front->data;
+            front = front->next;
+            delete t;
+        }
+        return x;
+    }
+
+    bool isEmpty() {
+        return front == nullptr;
+    }
 };
 
-
-void Graph::createGraph() {
-    cout << "Enter number of vertices: ";
-    cin >> vertices;
-
-    char edge;
-    
-    for (int i = 0; i < vertices; i++) {
-        for (int j = 0; j < vertices; j++) {
-            if (i == j) continue;  
-            cout << "Is there an edge between " << i << " and " << j << "? (y/n): ";
-            cin >> edge;
-            if (edge == 'y' || edge == 'Y') {
-                adj[i].push_back(j);  
+void BFS(int adj[][10], int start, int n) {
+    int visited[20] = {0};
+    cout << start << " ";
+    visited[start] = 1;
+    Queue q;
+    q.enqueue(start);
+    while (!q.isEmpty()) {
+        int u = q.dequeue();
+        for (int i = 0; i < n; i++) {
+            int v = adj[u][i];
+            if (v != 0 && visited[v] == 0) {
+                cout << v << " ";
+                visited[v] = 1;
+                q.enqueue(v);
             }
         }
     }
 }
 
-
-void Graph::dfs(int start) {
-    bool visited[10] = {false};   
-    stack<int> s;
-    s.push(start);               
-
-    cout << "DFS Traversal: ";
-    while (!s.empty()) {
-        int node = s.top();
-        s.pop();
-
-        if (!visited[node]) {
-            cout << node << " ";  
-            visited[node] = true;
-
-            
-            for (int i = adj[node].size() - 1; i >= 0; i--) {
-                if (!visited[adj[node][i]])
-                    s.push(adj[node][i]);
+void DFS(int G[][20], int start, int n) {
+    static int visited[20] = {0};
+    if (visited[start] == 0) {
+        cout << start << " ";
+        visited[start] = 1;
+        for (int j = 1; j <= n; j++) {
+            if (G[start][j] == 1 && visited[j] == 0) {
+                DFS(G, j, n);
             }
         }
     }
-    cout << endl;
-}
-
-
-void Graph::bfs(int start) {
-    bool visited[10] = {false};   
-    queue<int> q;
-    q.push(start);                
-
-    cout << "BFS Traversal: ";
-    while (!q.empty()) {
-        int node = q.front();
-        q.pop();
-
-        if (!visited[node]) {
-            cout << node << " ";  
-            visited[node] = true;
-
-            
-            for (int v : adj[node]) {
-                if (!visited[v])
-                    q.push(v);
-            }
-        }
-    }
-    cout << endl;
 }
 
 int main() {
-    Graph g;
-    g.createGraph();             
+    int n;
+    cout << "Enter number of nodes: ";
+    cin >> n;
+
+    int G[20][20] = {0};
+    int adj[20][10] = {0};
+
+    cout << "\nEnter adjacency matrix:\n";
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++) {
+            cin >> G[i][j];
+        }
+    }
+
+    cout << "\nEnter adjacency list:\n";
+    cout << "For each node, enter connected nodes (enter -1 to stop):\n";
+    for (int i = 1; i <= n; i++) {
+        cout << "Enter neighbors of node " << i << ": ";
+        int j = 0, neighbor;
+        while (true) {
+            cin >> neighbor;
+            if (neighbor == -1)
+                break;
+            adj[i][j++] = neighbor;
+        }
+    }
 
     int start;
-    cout << "Enter starting vertex for DFS: ";
+    cout << "\nEnter starting node for traversal: ";
     cin >> start;
-    g.dfs(start);                
 
-    cout << "Enter starting vertex for BFS: ";
-    cin >> start;
-    g.bfs(start);               
+    cout << "\nDFS Traversal (using Adjacency Matrix) starting from node " << start << ":" << endl;
+    DFS(G, start, n);
 
-    return 0;
+    cout << "\n\nBFS Traversal (using Adjacency List) starting from node " << start << ":" << endl;
+    BFS(adj, start, n);
+
+return 0;
 }
-
-
