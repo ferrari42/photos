@@ -1,174 +1,111 @@
 #include <iostream>
 using namespace std;
 
-class Node {
-public:
+struct Node {
     int data;
     Node* left;
     Node* right;
 
-    Node(int val) {
-        data = val;
-        left = right = nullptr;
+    Node(int value) {
+        data = value;
+        left = right = NULL;
     }
 };
 
-class BST {
-    Node* root; 
+Node* insert(Node* root, int value) {
+    if (root == NULL)
+        return new Node(value);
+    if (value < root->data)
+        root->left = insert(root->left, value);
+    else
+        root->right = insert(root->right, value);
+    return root;
+}
 
-    
-    Node* insert(Node* node, int val) {
-        if (!node) return new Node(val);  
-        if (val < node->data)
-            node->left = insert(node->left, val);  
-        else
-            node->right = insert(node->right, val);  
-        return node;
+int longestPath(Node* root) {
+    if (root == NULL)
+        return 0;
+    int leftHeight = longestPath(root->left);
+    int rightHeight = longestPath(root->right);
+    return 1 + max(leftHeight, rightHeight);
+}
+
+int findMin(Node* root) {
+    if (root == NULL) {
+        cout << "Tree is empty.";
+        return -1;
     }
+    while (root->left != NULL)
+        root = root->left;
+    return root->data;
+}
 
-   
-    void inorder(Node* node) {
-        if (!node) return;
-        inorder(node->left);
-        cout << node->data << " ";
-        inorder(node->right);
+void mirror(Node* root) {
+    if (root != NULL) {
+        mirror(root->left);
+        mirror(root->right);
+        swap(root->left, root->right);
     }
+}
 
-    
-    int height(Node* node) {
-        if (!node) return 0;
-        int leftH = height(node->left);
-        int rightH = height(node->right);
-        return 1 + max(leftH, rightH);
-    }
-
-   
-    int findMin(Node* node) {
-        if (!node) return -1;
-        while (node->left)
-            node = node->left; 
-        return node->data;
-    }
-
-   
-    void mirror(Node* node) {
-        if (!node) return;
-        mirror(node->left);
-        mirror(node->right);
-        swap(node->left, node->right);
-    }
-
-    
-    bool search(Node* node, int val) {
-        if (!node) return false;
-        if (val == node->data) return true;
-        if (val < node->data)
-            return search(node->left, val);  
-        else
-            return search(node->right, val);  
-    }
-
-public:
-    
-    BST() {
-        root = nullptr;
-    }
-
-    
-    void insert(int val) {
-        root = insert(root, val);
-    }
-
-    
-    void displayInorder() {
-        cout << "Inorder: ";
-        inorder(root);
-        cout << endl;
-    }
-
-    
-    int getHeight() {
-        return height(root);
-    }
-
-    
-    int getMin() {
-        return findMin(root);
-    }
-
-   
-    void mirrorTree() {
-        mirror(root);
-    }
-
-    
-    bool find(int val) {
-        return search(root, val);
-    }
-};
-
+bool search(Node* root, int key) {
+    if (root == NULL)
+        return false;
+    if (root->data == key)
+        return true;
+    else if (key < root->data)
+        return search(root->left, key);
+    else
+        return search(root->right, key);
+}
 
 int main() {
-    BST tree;
-    int n, val;
+    Node* root = NULL;
+    int choice, value;
 
-    
-    cout << "Enter number of values to insert: ";
-    cin >> n;
-    cout << "Enter values: ";
-    for (int i = 0; i < n; i++) {
-        cin >> val;
-        tree.insert(val);
-    }
-
-    int ch;
-   
     do {
-        cout << "\n--- BST MENU ---\n";
-        cout << "1. Insert Node\n";
-        cout << "2. Inorder Display\n";
-        cout << "3. Tree Height\n";
-        cout << "4. Minimum Value\n";
-        cout << "5. Mirror Tree\n";
-        cout << "6. Search Value\n";
-        cout << "7. Exit\n";
-        cout << "Enter choice: ";
-        cin >> ch;
+        cout << "\n\n----- BST OPERATIONS -----";
+        cout << "\n1. Insert new node";
+        cout << "\n2. Find number of nodes in longest path from root";
+        cout << "\n3. Find minimum data value in the tree";
+        cout << "\n4. Mirror the tree";
+        cout << "\n5. Search a value";
+        cout << "\n6. Exit";
+        cout << "\nEnter your choice: ";
+        cin >> choice;
 
-        switch (ch) {
-            case 1:
-                cout << "Enter value to insert: ";
-                cin >> val;
-                tree.insert(val);
-                break;
-            case 2:
-                tree.displayInorder();
-                break;
-            case 3:
-                cout << "Height of tree: " << tree.getHeight() << endl;
-                break;
-            case 4:
-                cout << "Minimum value: " << tree.getMin() << endl;
-                break;
-            case 5:
-                tree.mirrorTree();
-                cout << "Tree mirrored.\n";
-                break;
-            case 6:
-                cout << "Enter value to search: ";
-                cin >> val;
-                if (tree.find(val))
-                    cout << "Value found.\n";
-                else
-                    cout << "Value not found.\n";
-                break;
-            case 7:
-                cout << "Exiting...\n";
-                break;
-            default:
-                cout << "Invalid choice!\n";
+        switch (choice) {
+        case 1:
+            cout << "Enter value to insert: ";
+            cin >> value;
+            root = insert(root, value);
+            break;
+        case 2:
+            cout << "Longest path from root (Height): " << longestPath(root);
+            break;
+        case 3:
+            cout << "Minimum value in the tree: " << findMin(root);
+            break;
+        case 4:
+            mirror(root);
+            cout << "Tree has been mirrored.";
+            break;
+        case 5:
+            cout << "Enter value to search: ";
+            cin >> value;
+            if (search(root, value))
+                cout << "Value found!";
+            else
+                cout << "Value not found.";
+            break;
+        case 6:
+            cout << "Exiting...";
+            break;
+        default:
+            cout << "Invalid choice!";
         }
-    } while (ch != 7);
 
-return 0 ;
+    } while (choice != 6);
+
+ return 0;
 }
