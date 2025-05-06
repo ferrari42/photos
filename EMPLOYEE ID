@@ -1,0 +1,117 @@
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+class Employee {
+public:
+    int empID;
+    char name[30];
+    char designation[30];
+    float salary;
+
+    void input() {
+        cout << "Enter Employee ID: ";
+        cin >> empID;
+
+        cout << "Enter Name: ";
+        cin.ignore();            // Clear input buffer before using cin.getline
+        cin.getline(name, 30);
+
+        cout << "Enter Designation: ";
+        cin.getline(designation, 30);
+
+        cout << "Enter Salary: ";
+        cin >> salary;
+    }
+
+    void display() {
+        cout << "\nEmployee ID: " << empID
+             << "\nName: " << name
+             << "\nDesignation: " << designation
+             << "\nSalary: " << salary << endl;
+    }
+};
+
+void addEmployee() {
+    Employee emp;
+    emp.input();
+
+    ofstream fout("employee.dat", ios::binary | ios::app);
+    fout.write((char*)&emp, sizeof(emp));
+    fout.close();
+
+    cout << "Employee added successfully.\n";
+}
+
+void displayEmployee() {
+    Employee emp;
+    int searchID;
+    bool found = false;
+
+    cout << "Enter Employee ID to search: ";
+    cin >> searchID;
+
+    ifstream fin("employee.dat", ios::binary);
+    while (fin.read((char*)&emp, sizeof(emp))) {
+        if (emp.empID == searchID) {
+            cout << "\nEmployee Found:";
+            emp.display();
+            found = true;
+            break;
+        }
+    }
+    fin.close();
+
+    if (!found)
+        cout << "Employee not found.\n";
+}
+
+void deleteEmployee() {
+    Employee emp;
+    int deleteID;
+    bool found = false;
+
+    cout << "Enter Employee ID to delete: ";
+    cin >> deleteID;
+
+    ifstream fin("employee.dat", ios::binary);
+    ofstream fout("temp.dat", ios::binary);
+
+    while (fin.read((char*)&emp, sizeof(emp))) {
+        if (emp.empID == deleteID) {
+            found = true; // Skip writing this employee to new file
+            continue;
+        }
+        fout.write((char*)&emp, sizeof(emp));
+    }
+
+    fin.close();
+    fout.close();
+
+    remove("employee.dat");
+    rename("temp.dat", "employee.dat");
+
+    if (found)
+        cout << "Employee deleted successfully.\n";
+    else
+        cout << "Employee not found.\n";
+}
+
+int main() {
+    int choice;
+    do {
+        cout << "\n--- Employee Management System ---\n";
+        cout << "1. Add Employee\n2. Display Employee\n3. Delete Employee\n4. Exit\nEnter choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: addEmployee(); break;
+            case 2: displayEmployee(); break;
+            case 3: deleteEmployee(); break;
+            case 4: cout << "Exiting...\n"; break;
+            default: cout << "Invalid choice!\n";
+        }
+    } while (choice != 4);
+
+    return 0;
+}
