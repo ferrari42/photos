@@ -1,0 +1,70 @@
+#include <iostream>
+using namespace std;
+
+class Node {
+public:
+    int data;
+    Node *left, *right;
+    bool rThread;
+
+    Node(int val) {
+        data = val;
+        left = right = nullptr;
+        rThread = false;
+    }
+};
+
+Node* insert(Node* root, int val) {
+    if (!root)
+        return new Node(val);
+    if (val < root->data)
+        root->left = insert(root->left, val);
+    else if (val > root->data)
+        root->right = insert(root->right, val);
+    return root;
+}
+
+void createThreaded(Node* root, Node*& prev) {
+    if (root == nullptr) return;
+    createThreaded(root->left, prev);
+    if (prev && prev->right == nullptr) {
+        prev->right = root;
+        prev->rThread = true;
+    }
+    prev = root;
+    createThreaded(root->right, prev);
+}
+
+Node* leftMost(Node* node) {
+    while (node && node->left)
+        node = node->left;
+    return node;
+}
+
+void inorderTraversal(Node* root) {
+    Node* current = leftMost(root);
+    while (current) {
+        cout << current->data << " ";
+        if (current->rThread)
+            current = current->right;
+        else
+            current = leftMost(current->right);
+    }
+}
+
+int main() {
+    Node* root = nullptr;
+    int n, val;
+    cout << "Enter number of nodes: ";
+    cin >> n;
+    cout << "Enter " << n << " node values:\n";
+    for (int i = 0; i < n; i++) {
+        cin >> val;
+        root = insert(root, val);
+    }
+    Node* prev = nullptr;
+    createThreaded(root, prev);
+    cout << "\nInorder Traversal using Threaded Binary Tree:\n";
+    inorderTraversal(root);
+    return 0;
+}
