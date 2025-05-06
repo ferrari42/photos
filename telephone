@@ -1,61 +1,140 @@
-# Hash Table size
-SIZE = 10
+SIZE = 100
 
-# Linear Probing Implementation
-class LinearProbingHashTable:
-    def init(self):
-        self.table = [None] * SIZE
+class Node:
+    def _init_(self, data, next=None):
+        self.data = data
+        self.next = next
 
-    def insert(self, name, number):
-        index = hash(name) % SIZE
-        while self.table[index] is not None:
+def insert(head, data):
+    node = Node(data)
+    if head is None:
+        return node
+    temp = head
+    while temp.next is not None:
+        temp = temp.next
+    temp.next = node
+    return head
+
+class HashTableC:
+    def _init_(self):
+        self.ht = [Node(-1) for _ in range(SIZE)]
+
+    def hashFunction(self, data):
+        return data % SIZE
+
+    def insert(self, data):
+        index = self.hashFunction(data)
+        if self.ht[index].data == -1:
+            print("No collision occurred while inserting")
+            self.ht[index].data = data
+        else:
+            print("Collision occurred while inserting!")
+            self.ht[index] = insert(self.ht[index], data)
+
+    def printHashTable(self):
+        for i in range(SIZE):
+            if self.ht[i].data != -1:
+                temp = self.ht[i]
+                while temp.next is not None:
+                    print(temp.data, end=" -> ")
+                    temp = temp.next
+                print(temp.data)
+
+    def search(self, data):
+        index = self.hashFunction(data)
+        temp = self.ht[index]
+        while temp is not None:
+            if temp.data == -1:
+                print("Phone Number not present in the directory!")
+                return
+            elif temp.data == data:
+                print("Phone Number found in the directory!")
+                return
+            temp = temp.next
+        print("Phone Number not present in the directory!")
+
+class HashTableLP:
+    def _init_(self):
+        self.ht = [-1] * SIZE
+
+    def hashFunction(self, data):
+        return data % SIZE
+
+    def insert(self, data):
+        index = self.hashFunction(data)
+        if self.ht[index] == -1:
+            print("No collision occurred while inserting")
+            self.ht[index] = data
+        else:
+            print("Collision occurred while inserting")
+            flag = False
+            start = index
+            while True:
+                index = (index + 1) % SIZE
+                if self.ht[index] == -1:
+                    self.ht[index] = data
+                    flag = True
+                    return
+                if index == start:
+                    break
+            if not flag:
+                print("The directory is full!")
+
+    def printHashTable(self):
+        for i in range(SIZE):
+            if self.ht[i] != -1:
+                print(self.ht[i])
+
+    def search(self, data):
+        index = self.hashFunction(data)
+        if self.ht[index] == data:
+            print("Phone Number found in the directory!")
+            return
+        start = index
+        while True:
             index = (index + 1) % SIZE
-        self.table[index] = (name, number)
+            if self.ht[index] == data:
+                print("Phone Number found in the directory!")
+                return
+            if self.ht[index] == -1 or index == start:
+                break
+        print("Phone Number not found in the directory!")
 
-    def search(self, name):
-        index = hash(name) % SIZE
-        comparisons = 0
-        while self.table[index] is not None:
-            comparisons += 1
-            if self.table[index][0] == name:
-                return comparisons
-            index = (index + 1) % SIZE
-        return comparisons
+def main():
+    print("Phone Number Directory using Hash Table")
+    method = int(input("Enter 1 for chaining method\nEnter 2 for linear probing method\n"))
 
-# Chaining Implementation
-class ChainingHashTable:
-    def init(self):
-        self.table = [[] for _ in range(SIZE)]
+    if method == 1:
+        ht = HashTableC()
+    elif method == 2:
+        ht = HashTableLP()
+    else:
+        print("Please enter a valid method!")
+        return
 
-    def insert(self, name, number):
-        index = hash(name) % SIZE
-        self.table[index].append((name, number))
+    while True:
+        choice = int(input("\nEnter 1 to insert a Phone Number in the directory\n"
+                           "Enter 2 to search a Phone Number in the directory\n"
+                           "Enter 3 to Print the directory\n"
+                           "Enter 4 to quit\n"))
+        if choice == 1:
+            n = int(input("Enter the count of Phone Numbers to be inserted:\n"))
+            for _ in range(n):
+                x = int(input("Enter the Phone Number to be inserted:\n"))
+                if len(str(x)) != 10:
+                    print("Please enter a valid 10-digit number!")
+                else:
+                    ht.insert(x)
+        elif choice == 2:
+            x = int(input("Enter the Phone Number to be searched in the directory:\n"))
+            ht.search(x)
+        elif choice == 3:
+            ht.printHashTable()
+        elif choice == 4:
+            print("Thanks for trying out my code ")
+            break
+        else:
+            print("Please Enter a valid choice!")
 
-    def search(self, name):
-        index = hash(name) % SIZE
-        comparisons = 0
-        for entry in self.table[index]:
-            comparisons += 1
-            if entry[0] == name:
-                return comparisons
-        return comparisons
-
-# Sample data
-clients = [("Alice", "1111"), ("Bob", "2222"), ("Charlie", "3333"),
-           ("David", "4444"), ("Eve", "5555"), ("Frank", "6666")]
-
-# Initialize tables
-linear_table = LinearProbingHashTable()
-chaining_table = ChainingHashTable()
-
-# Insert clients
-for name, number in clients:
-    linear_table.insert(name, number)
-    chaining_table.insert(name, number)
-
-# Compare search
-print("Comparisons (Name | Linear | Chaining):")
-for name, _ in clients:
-    l_comp = linear_table.search(name)
-    c_comp = chaining_table.search(name)
-    print(f"{name:<7} | {l_comp:^6} | {c_comp:^8}")
+if _name_ == "_main_":
+    main()
