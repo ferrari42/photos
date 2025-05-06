@@ -1,30 +1,25 @@
 #include <iostream>
-#include <cstring>   // For strcpy
 using namespace std;
 
-/* Structure representing a node in the tree (Book, Chapter, Section, Subsection) */
 struct Node {
-    char label[50];          // Name or label of the node
-    int count;               // Number of children
-    Node* children[10];      // Array of child nodes (max 10)
+    char label[50];
+    int count;
+    Node* children[10];
 };
 
-/* Class to manage the Book Tree */
 class BookTree {
 private:
-    Node* root;  // Root node
+    Node* root;
 
 public:
     BookTree() {
         root = NULL;
     }
 
-    /* Function to create the tree */
     void create() {
         root = new Node;
         cout << "Enter Book Name: ";
-        cin.ignore();
-        cin.getline(root->label, 50);
+        cin >> root->label;
 
         cout << "Enter number of Chapters: ";
         cin >> root->count;
@@ -32,8 +27,7 @@ public:
         for (int i = 0; i < root->count; i++) {
             root->children[i] = new Node;
             cout << "  Enter Chapter " << i + 1 << " Name: ";
-            cin.ignore();
-            cin.getline(root->children[i]->label, 50);
+            cin >> root->children[i]->label;
 
             cout << "  Enter number of Sections in Chapter: ";
             cin >> root->children[i]->count;
@@ -41,8 +35,7 @@ public:
             for (int j = 0; j < root->children[i]->count; j++) {
                 root->children[i]->children[j] = new Node;
                 cout << "    Enter Section " << j + 1 << " Name: ";
-                cin.ignore();
-                cin.getline(root->children[i]->children[j]->label, 50);
+                cin >> root->children[i]->children[j]->label;
 
                 cout << "    Enter number of Subsections in Section: ";
                 cin >> root->children[i]->children[j]->count;
@@ -50,14 +43,12 @@ public:
                 for (int k = 0; k < root->children[i]->children[j]->count; k++) {
                     root->children[i]->children[j]->children[k] = new Node;
                     cout << "      Enter Subsection " << k + 1 << " Name: ";
-                    cin.ignore();
-                    cin.getline(root->children[i]->children[j]->children[k]->label, 50);
+                    cin >> root->children[i]->children[j]->children[k]->label;
                 }
             }
         }
     }
 
-    /* Function to display the tree */
     void display(Node* node) {
         if (node == NULL) {
             cout << "Tree is empty.\n";
@@ -83,27 +74,11 @@ public:
         cout << endl;
     }
 
-    // Getter to return root
     Node* getRoot() {
         return root;
     }
-
-    // Destructor to delete dynamically allocated memory
-    void deleteTree(Node* node) {
-        if (node == NULL)
-            return;
-        for (int i = 0; i < node->count; i++) {
-            deleteTree(node->children[i]);
-        }
-        delete node;
-    }
-
-    ~BookTree() {
-        deleteTree(root);
-    }
 };
 
-/* Main function */
 int main() {
     BookTree book;
     int choice;
@@ -120,10 +95,9 @@ int main() {
                 book.display(book.getRoot());
                 break;
             case 3:
-                cout << "Exiting Program.\n";
                 return 0;
             default:
-                cout << "Invalid choice. Please try again.\n";
- }
-}
+                cout << "Invalid choice. Try again.\n";
+        }
+    }
 }
