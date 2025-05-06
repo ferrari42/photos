@@ -1,0 +1,86 @@
+#include <iostream>
+using namespace std;
+
+const int INF = 32767;
+
+void printMST(int T[][100], int numVertices) {
+    cout << "\nMinimum Cost Spanning Tree Connections:\n";
+    for (int i = 0; i < numVertices - 1; i++) {
+        cout << "Office " << T[0][i] << " --- Office " << T[1][i] << endl;
+    }
+}
+
+int findParent(int u, int parent[]) {
+    while (parent[u] > 0) {
+        u = parent[u];
+    }
+    return u;
+}
+
+void unionSets(int u, int v, int parent[]) {
+    if (parent[u] < parent[v]) {
+        parent[u] += parent[v];
+        parent[v] = u;
+    } else {
+        parent[v] += parent[u];
+        parent[u] = v;
+    }
+}
+
+void kruskalMST(int edges[3][100], int numVertices, int numEdges) {
+    int T[2][100];
+    int track[100] = {0};
+    int parent[100];
+    for (int i = 0; i <= numVertices; i++) {
+        parent[i] = -1;
+    }
+
+    int edgesUsed = 0;
+
+    while (edgesUsed < numVertices - 1) {
+        int minCost = INF;
+        int selectedEdge = -1;
+        int u = -1, v = -1;
+
+        for (int i = 0; i < numEdges; i++) {
+            if (track[i] == 0 && edges[2][i] < minCost) {
+                minCost = edges[2][i];
+                u = edges[0][i];
+                v = edges[1][i];
+                selectedEdge = i;
+            }
+        }
+
+        if (findParent(u, parent) != findParent(v, parent)) {
+            T[0][edgesUsed] = u;
+            T[1][edgesUsed] = v;
+            unionSets(findParent(u, parent), findParent(v, parent), parent);
+            edgesUsed++;
+        }
+
+        track[selectedEdge] = 1;
+    }
+
+    printMST(T, numVertices);
+}
+
+int main() {
+    int numVertices, numEdges;
+    int edges[3][100];
+
+    cout << "Enter number of offices (vertices): ";
+    cin >> numVertices;
+
+    cout << "Enter number of possible connections (edges): ";
+    cin >> numEdges;
+
+    cout << "Enter details of each connection (Format: fromOffice toOffice cost):\n";
+    for (int i = 0; i < numEdges; i++) {
+        cout << "Connection " << i + 1 << ": ";
+        cin >> edges[0][i] >> edges[1][i] >> edges[2][i];
+    }
+
+    kruskalMST(edges, numVertices, numEdges);
+
+    return 0;
+}
