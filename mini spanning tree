@@ -1,102 +1,111 @@
 #include <iostream>
 using namespace std;
 
-class Graph {
-    int cost[20][20];  
-    int visited[20];    
-    int offices, lines; 
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
 
-public:
-    void input();      
-    void display();     
-    void prim();       
+    Node(int value) {
+        data = value;
+        left = right = NULL;
+    }
 };
 
+Node* insert(Node* root, int value) {
+    if (root == NULL)
+        return new Node(value);
+    if (value < root->data)
+        root->left = insert(root->left, value);
+    else
+        root->right = insert(root->right, value);
+    return root;
+}
 
-void Graph::input() {
-    cout << "Enter number of offices: ";
-    cin >> offices;
+int longestPath(Node* root) {
+    if (root == NULL)
+        return 0;
+    int leftHeight = longestPath(root->left);
+    int rightHeight = longestPath(root->right);
+    return 1 + max(leftHeight, rightHeight);
+}
 
-    
-    for (int i = 0; i < offices; i++) {
-        visited[i] = 0;
-        for (int j = 0; j < offices; j++) {
-            cost[i][j] = 999; 
-        }
+int findMin(Node* root) {
+    if (root == NULL) {
+        cout << "Tree is empty.";
+        return -1;
     }
+    while (root->left != NULL)
+        root = root->left;
+    return root->data;
+}
 
-    cout << "Enter number of connections: ";
-    cin >> lines;
-
-    for (int i = 0; i < lines; i++) {
-        int from, to, wt;
-        cout << "Enter connection " << i + 1 << " (office1 office2 cost): ";
-        cin >> from >> to >> wt;
-        cost[from - 1][to - 1] = wt;
-        cost[to - 1][from - 1] = wt;
+void mirror(Node* root) {
+    if (root != NULL) {
+        mirror(root->left);
+        mirror(root->right);
+        swap(root->left, root->right);
     }
 }
 
-
-void Graph::display() {
-    cout << "\nAdjacency Matrix:\n";
-    for (int i = 0; i < offices; i++) {
-        for (int j = 0; j < offices; j++) {
-            cout << cost[i][j] << "\t";
-        }
-        cout << endl;
-    }
+bool search(Node* root, int key) {
+    if (root == NULL)
+        return false;
+    if (root->data == key)
+        return true;
+    else if (key < root->data)
+        return search(root->left, key);
+    else
+        return search(root->right, key);
 }
-
-
-void Graph::prim() {
-    int total = 0;
-    visited[0] = 1;  
-
-    cout << "\nMinimum cost connections:\n";
-
-    for (int edges = 0; edges < offices - 1; edges++) {
-        int min = 999, u = -1, v = -1;
-
-        for (int i = 0; i < offices; i++) {
-            if (visited[i]) {
-                for (int j = 0; j < offices; j++) {
-                    if (!visited[j] && cost[i][j] < min) {
-                        min = cost[i][j];
-                        u = i;
-                        v = j;
-                    }
-                }
-            }
-        }
-
-        visited[v] = 1;  
-        total += min;
-        cout << "Office " << u + 1 << " -> Office " << v + 1 << " : Cost = " << min << endl;
-    }
-
-    cout << "Total Minimum Cost: " << total << endl;
-}
-
 
 int main() {
-    Graph g;
-    int choice;
+    Node* root = NULL;
+    int choice, value;
 
     do {
-        cout << "\n======= PRIM'S ALGORITHM MENU =======\n";
-        cout << "1. Input\n2. Display\n3. Find Minimum Cost\n4. Exit\n";
-        cout << "Enter your choice: ";
+        cout << "\n\n----- BST OPERATIONS -----";
+        cout << "\n1. Insert new node";
+        cout << "\n2. Find number of nodes in longest path from root";
+        cout << "\n3. Find minimum data value in the tree";
+        cout << "\n4. Mirror the tree";
+        cout << "\n5. Search a value";
+        cout << "\n6. Exit";
+        cout << "\nEnter your choice: ";
         cin >> choice;
 
         switch (choice) {
-            case 1: g.input(); break;
-            case 2: g.display(); break;
-            case 3: g.prim(); break;
-            case 4: cout << "Exiting...\n"; break;
-            default: cout << "Invalid choice! Try again.\n";
+        case 1:
+            cout << "Enter value to insert: ";
+            cin >> value;
+            root = insert(root, value);
+            break;
+        case 2:
+            cout << "Longest path from root (Height): " << longestPath(root);
+            break;
+        case 3:
+            cout << "Minimum value in the tree: " << findMin(root);
+            break;
+        case 4:
+            mirror(root);
+            cout << "Tree has been mirrored.";
+            break;
+        case 5:
+            cout << "Enter value to search: ";
+            cin >> value;
+            if (search(root, value))
+                cout << "Value found!";
+            else
+                cout << "Value not found.";
+            break;
+        case 6:
+            cout << "Exiting...";
+            break;
+        default:
+            cout << "Invalid choice!";
         }
-    } while (choice != 4);
 
-return 0;
+    } while (choice != 6);
+
+    return 0;
 }
